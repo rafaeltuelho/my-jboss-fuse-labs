@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<orders>
+	<order>
+		<id>1</id>
+		<date>02-09-2015</date>
+		<vendor>Red Hat</vendor>
+		<region>LATAM</region>
+		<customer>Tuelho</customer>
+		<amount>500</amount>
+	</order>
+	<order>
+		<id>2</id>
+		<date>02-09-2015</date>
+		<vendor>Red Hat</vendor>
+		<region>LATAM</region>
+		<customer>Tuelho</customer>
+		<amount>500</amount>
+	</order>	
+</orders>

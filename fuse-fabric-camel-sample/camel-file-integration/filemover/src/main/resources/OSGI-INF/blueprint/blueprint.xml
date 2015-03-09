@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:camel="http://camel.apache.org/schema/blueprint"
+       xsi:schemaLocation="
+       http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+       http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
+
+  <camelContext trace="false" id="blueprintContext" xmlns="http://camel.apache.org/schema/blueprint">
+    <route id="fileMover">
+        <from uri="file:filesystem/in"/>
+        <log message="I got a new file from the FS!" loggingLevel="INFO"/>
+        <split streaming="true">
+            <tokenize token="order" xml="true"></tokenize>
+            <to uri="amq:personal.records"/>
+        </split>
+    </route>
+</camelContext>
+
+</blueprint>

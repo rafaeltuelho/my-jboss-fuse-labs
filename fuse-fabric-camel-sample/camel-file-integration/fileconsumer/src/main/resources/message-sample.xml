@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<orders>
+	<order>
+		<id>1</id>
+		<date>02-09-2015</date>
+		<vendor>Red Hat</vendor>
+		<region>LATAM</region>
+		<customer>Rafael T. C. Soares</customer>
+		<amount>20000</amount>
+	</order>	
+</orders>

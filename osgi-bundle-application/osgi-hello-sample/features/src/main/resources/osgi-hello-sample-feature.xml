@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<features name="osgi-bundle-application">
+  <feature name="osgi-hello-sample">
+    <bundle>wrap:mvn:joda-time/joda-time/2.7</bundle>
+    <bundle>mvn:br.net.rafaeltuelho.osgi/timeutil/0.0.2-SNAPSHOT</bundle>
+    <bundle>mvn:br.net.rafaeltuelho.osgi/hello-bahia/0.0.1-SNAPSHOT</bundle>
+    <bundle>mvn:br.net.rafaeltuelho.osgi/hello-bahia-impl/0.0.1-SNAPSHOT</bundle>
+    <bundle>mvn:br.net.rafaeltuelho.osgi/hello-saopaulo/0.0.1-SNAPSHOT</bundle>
+    <bundle>mvn:br.net.rafaeltuelho.osgi/hello-consumer/0.0.1-SNAPSHOT</bundle>
+  </feature>
+</features>

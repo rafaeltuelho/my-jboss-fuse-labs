@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<features name="get-started">
+  <feature name="get-started-basic">
+    <bundle>mvn:org.fusesource.example/cxf-basic/1.0-SNAPSHOT</bundle>
+    <bundle>mvn:org.fusesource.example/camel-basic/1.0-SNAPSHOT</bundle>
+  </feature>
+  <feature name="get-started-cxf">
+    <bundle>mvn:org.fusesource.example/cxf-basic/1.0-SNAPSHOT</bundle>
+  </feature>
+</features>

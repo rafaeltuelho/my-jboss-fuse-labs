@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+	<reference id="helloSaoPaulo"
+		interface="br.net.rafaeltuelho.osgi.hello.saopaulo.HelloSaoPaulo" />
+
+	<reference id="helloBahia" interface="br.net.rafaeltuelho.osgi.hello.bahia.HelloBahia" />
+
+	<bean id="client" class="br.net.rafaeltuelho.osgi.hello.consumer.ConsumerHello" init-method="init">
+		<property name="helloSaoPaulo" ref="helloSaoPaulo" />
+		<property name="helloBahia" ref="helloBahia" />
+	</bean>
+
+</blueprint>

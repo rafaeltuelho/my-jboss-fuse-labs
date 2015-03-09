@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+	<bean id="hello-bahia-impl" class="br.net.rafaeltuelho.osgi.hello.bahia.impl.HelloBahiaImpl" />
+	<service ref="hello-bahia-impl" interface="br.net.rafaeltuelho.osgi.hello.bahia.HelloBahia" />
+
+</blueprint>
