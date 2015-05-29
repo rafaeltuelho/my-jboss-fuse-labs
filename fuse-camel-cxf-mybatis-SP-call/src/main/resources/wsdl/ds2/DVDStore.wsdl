@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://rafaeltuelho.net.br/dvdstore/services/v1"
+	xmlns:domain="http://rafaeltuelho.net.br/dvdstore/domain/v1"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://rafaeltuelho.net.br/dvdstore/services/v1">
+
+    <wsdl:types>
+		<xsd:schema targetNamespace="http://rafaeltuelho.net.br/dvdstore/services/v1">
+			<xsd:import namespace="http://rafaeltuelho.net.br/dvdstore/domain/v1" schemaLocation="inventory_v1_0.xsd" />
+			
+			<xsd:element name="searchByActorRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="limit" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+						<xsd:element name="actorName" type="xsd:string" minOccurs="1" maxOccurs="1" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="searchByActorResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+					    <xsd:element name="message" type="xsd:string"/>
+					    <xsd:element name="time" type="xsd:dateTime"/>
+						<xsd:element name="products" type="domain:product"
+							minOccurs="0" maxOccurs="unbounded"  />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+		</xsd:schema>
+	</wsdl:types>
+
+	<wsdl:message name="searchByActorRequest">
+		<wsdl:part element="tns:searchByActorRequest" name="in" />
+	</wsdl:message>
+	<wsdl:message name="searchByActorResponse">
+		<wsdl:part element="tns:searchByActorResponse" name="out" />
+	</wsdl:message>
+
+	<wsdl:portType name="DVDStoreServiceEndpoint">
+		<wsdl:operation name="searchByActor">
+			<wsdl:input message="tns:searchByActorRequest" />
+			<wsdl:output message="tns:searchByActorResponse" />
+		</wsdl:operation>
+	</wsdl:portType>
+
+	<wsdl:binding name="DVDStoreServiceSOAPBinding" type="tns:DVDStoreServiceEndpoint">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="searchByActor">
+			<soap:operation
+				soapAction="http://br.net.rafaeltuelho/dvdstore/services/v1/searchByActor" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+
+	<wsdl:service name="DVDStoreServiceEndpointService">
+		<wsdl:port name="DVDStoreServiceSOAPPort" binding="tns:DVDStoreServiceSOAPBinding">
+			<soap:address location="http://localhost:8787/dvdstore/" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

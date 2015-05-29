@@ -22,7 +22,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 
-	<repositories>
+	<!-- repositories>
 		<repository>
 			<id>release.fusesource.org</id>
 			<name>FuseSource Release Repository</name>
@@ -56,9 +56,9 @@
 				<enabled>false</enabled>
 			</releases>
 		</repository>
-	</repositories>
+	</repositories -->
 
-	<pluginRepositories>
+	<!-- pluginRepositories>
 		<pluginRepository>
 			<id>release.fusesource.org</id>
 			<name>FuseSource Release Repository</name>
@@ -92,7 +92,7 @@
 				<enabled>false</enabled>
 			</releases>
 		</pluginRepository>
-	</pluginRepositories>
+	</pluginRepositories -->
 
 	<dependencies>
 		<dependency>
@@ -188,7 +188,8 @@
 			<plugin>
 				<groupId>io.fabric8</groupId>
 				<artifactId>fabric8-maven-plugin</artifactId>
-				<version>1.2.0.redhat-064</version>
+				<!-- version>1.2.0.redhat-064</version-->
+				<version>1.0.0.redhat-379</version>
 				<configuration>
 					<profile>demos-filemover</profile>
 					<parentProfiles>feature-camel</parentProfiles>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+    PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+  <!-- Use type aliases to avoid typing the full classname every time. -->
+  <typeAliases>
+    <typeAlias alias="Product" type="br.net.rafaeltuelho.dvdstore.domain.v1.Product"/>
+    <typeAlias alias="SearchByActorRequest" type="br.net.rafaeltuelho.dvdstore.services.v1.SearchByActorRequest"/>
+  </typeAliases>
+
+  <!-- setup environment with JDBC data source -->
+  <environments default="development">
+    <environment id="development">
+      
+      <transactionManager type="JDBC"/>
+      
+      <dataSource type="POOLED">
+		 <property name="driver"   value="org.postgresql.Driver"/>
+		 <property name="url"      value="jdbc:postgresql://vm.rhel7:5432/ds2"/>
+		 <property name="username" value="ds2"/>
+		 <property name="password" value="ds2"/>
+      </dataSource>
+    
+    </environment>
+  </environments>
+
+  <!-- mapping files -->
+  <mappers>
+    <mapper resource="mybatis/mappers/Products.xml"/>
+  </mappers>
+
+</configuration>

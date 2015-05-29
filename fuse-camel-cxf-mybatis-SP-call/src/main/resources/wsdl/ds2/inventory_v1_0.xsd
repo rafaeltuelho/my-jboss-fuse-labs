@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+	targetNamespace="http://rafaeltuelho.net.br/dvdstore/domain/v1" 
+	xmlns:tns="http://rafaeltuelho.net.br/dvdstore/domain/v1" 
+	elementFormDefault="qualified">
+
+	<annotation>
+		<documentation>Represents a Product entity from the DVD Store Domain Model</documentation>
+	</annotation>
+
+    <complexType name="product">
+    	<sequence>
+    		<element name="id" type="int"></element>
+    		<element name="category" type="string"></element>
+    		<element name="title" type="string"></element>
+    		<element name="actor" type="string"></element>
+    		<element name="price" type="double"></element>
+    		<element name="special" type="int"></element>
+    		<element name="commonId" type="int"></element>
+    	</sequence>
+    </complexType>
+
+</schema>

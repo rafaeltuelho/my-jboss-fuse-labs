@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+           xmlns:cxf="http://camel.apache.org/schema/blueprint/cxf"
+           xmlns:camel="http://camel.apache.org/schema/blueprint"
+           xmlns:cxfcore="http://cxf.apache.org/blueprint/core"
+           xsi:schemaLocation="
+             http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+             http://camel.apache.org/schema/blueprint/cxf http://camel.apache.org/schema/blueprint/cxf/camel-cxf.xsd
+             http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd
+             http://cxf.apache.org/schemas/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd
+             http://cxf.apache.org/blueprint/jaxws http://cxf.apache.org/blueprint/jaxws.xsd">
+  
+  <bean id="helperBean" class="br.net.rafaeltuelho.beans.RouteHelper"/>
+  <bean id="responseNotOk" class="br.net.rafaeltuelho.dvdstore.services.v1.SearchByActorResponse">
+  	<property name="message" value="Please fill all the mandatory params!" />
+  </bean>
+  
+  <bean id="dropAllMessageHeadersStrategy" class="org.apache.camel.component.cxf.common.header.CxfHeaderFilterStrategy">
+    <!--  Set relayHeaders to false to drop all SOAP headers -->
+    <property name="relayHeaders" value="false"/>
+  </bean>
+  
+  <!-- List of Interceptors and Features: cxf-bundle-2.7.0.redhat-610379-javadoc/index.html -->
+  <bean id="loggingInInterceptor" class="org.apache.cxf.interceptor.LoggingInInterceptor" />
+  <bean id="loggingOutInterceptor" class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
+  <bean id="loggingFeature" class="org.apache.cxf.feature.LoggingFeature" />
+  <bean id="gZIPFeature" class="org.apache.cxf.transport.common.gzip.GZIPFeature" />
+  <bean id="responseTimeFeature" class="org.apache.cxf.management.interceptor.ResponseTimeFeature" />
+
+  <!-- setup the feature on the bus to help publish the services to the fabric-->
+  <cxfcore:bus bus="cxf">
+      <cxfcore:features>
+   		<ref component-id="loggingFeature" />
+   		<ref component-id="gZIPFeature" />
+   		<ref component-id="responseTimeFeature" />
+      </cxfcore:features>
+      <!-- 
+      <cxfcore:inInterceptors>
+   		<ref component-id="loggingInInterceptor" />
+      </cxfcore:inInterceptors>
+      <cxfcore:outInterceptors>
+   		<ref component-id="loggingOutInterceptor" />
+      </cxfcore:outInterceptors>
+      <cxfcore:inFaultInterceptors>
+   		<ref component-id="loggingOutInterceptor" />
+      </cxfcore:inFaultInterceptors>
+      <cxfcore:outFaultInterceptors>
+   		<ref component-id="loggingOutInterceptor" />
+      </cxfcore:outFaultInterceptors>
+      -->
+  </cxfcore:bus>
+      	
+  <cxf:cxfEndpoint id="dvdStoreService"
+                   address="/dvdStore/"
+                   serviceClass="br.net.rafaeltuelho.dvdstore.services.v1.DVDStoreServiceEndpoint"
+                   wsdlURL="wsdl/ds2/DVDStore.wsdl"
+                   serviceName="s:DVDStoreServiceEndpointService"
+                   endpointName="s:DVDStoreServiceSOAPPort"
+                   xmlns:s="http://rafaeltuelho.net.br/dvdstore/services/v1">
+   </cxf:cxfEndpoint>
+
+<camelContext trace="false" id="context-c64b9ccb-210d-4176-909e-5ce9d2c3c803" xmlns="http://camel.apache.org/schema/blueprint">
+  <propertyPlaceholder location="classpath:fabric8/sql.query.properties,blueprint:sql.query" id="placeholder"/>
+  <route shutdownRoute="Default" id="main">
+    <from uri="cxf:bean:dvdStoreService?dataFormat=POJO&amp;headerFilterStrategy=#dropAllMessageHeadersStrategy"/>
+    <removeHeaders pattern="*encoding*"/>
+    <log message="[version 1.1] Received DVD Search request..."/>
+    <convertBodyTo type="br.net.rafaeltuelho.dvdstore.services.v1.SearchByActorRequest" id="convertBodyTo1"/>
+    <choice id="cbr1">
+      <when>
+        <simple>${body.limit} != 0 &amp;&amp; ${body.actorName} != null &amp;&amp; ${body.actorName} not regex '^\s*$'</simple>
+        <log message="after conversion: ${body}"/>
+        <to uri="mybatis:browseByActor?statementType=SelectList&amp;consumer.useIterator=true"/>
+        <log message="   Response products list INIT SIZE: ${body.size}" id="log1"/>
+        <bean ref="helperBean" method="fillServiceResponse(${body})" id="bean1"/>
+        <log message="   Response products list FINAL SIZE: ${body.products.size}" id="log1"/>
+      </when>
+      <otherwise>
+        <log message="Limit can't be zero!"/>
+        <setBody>
+          <simple>ref:responseNotOk</simple>
+        </setBody>
+      </otherwise>
+    </choice>
+  </route>
+</camelContext>
+
+</blueprint>
