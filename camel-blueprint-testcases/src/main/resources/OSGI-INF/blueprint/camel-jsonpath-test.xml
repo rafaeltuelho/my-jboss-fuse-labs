@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+       xmlns:camel="http://camel.apache.org/schema/blueprint"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+       http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
+
+    <!-- from uri="file:data/input?noop=true&amp;include=.*.json&amp;autoCreate=true&amp;readLock=markerFile"/ -->
+    <!-- log message=" File Name: ${file:name.noext}" id="log2"/ -->
+
+
+  <camel:camelContext trace="true" id="context-b27e84d4-08bc-429c-b82a-75483d53c3c0" xmlns="http://camel.apache.org/schema/blueprint">
+  <camel:dataFormats>
+    <camel:json library="Jackson" id="jack"/>
+  </camel:dataFormats>
+  <camel:route>
+    <camel:from uri="direct:input"/>
+    <camel:log message="Store Body: ${body}" id="log1"/>
+    <camel:setProperty propertyName="msgBodyCopy">
+    	<camel:simple>${body}</camel:simple>
+    </camel:setProperty>
+    <camel:split>
+      <camel:jsonpath>$.store.books[*]</camel:jsonpath>
+      <camel:choice>
+        <camel:when>
+          <camel:simple>${body[category]} == 'programming'</camel:simple>
+          <camel:log message="Programming Category: ${body[category]}"/>
+          <camel:convertBodyTo type="java.lang.String"/>
+          <camel:multicast>
+            <camel:to uri="file:data/output/programming"/>
+            <camel:to uri="mock:programming"/>
+          </camel:multicast>
+        </camel:when>
+        <camel:otherwise>
+          <camel:log message="Other Category: ${body[category]}"/>
+          <camel:convertBodyTo type="java.lang.String"/>
+          <camel:multicast>
+            <camel:to uri="file:data/output/others"/>
+            <camel:to uri="mock:other"/>
+          </camel:multicast>
+        </camel:otherwise>
+      </camel:choice>
+    </camel:split>
+  </camel:route>
+</camel:camelContext>
+
+</blueprint>
