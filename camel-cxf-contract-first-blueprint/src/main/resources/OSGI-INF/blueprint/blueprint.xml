@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:cxf="http://camel.apache.org/schema/blueprint/cxf"
+           xsi:schemaLocation="
+             http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+             http://camel.apache.org/schema/blueprint/cxf http://camel.apache.org/schema/blueprint/cxf/camel-cxf.xsd
+             http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
+
+  <cxf:cxfEndpoint id="reportEndpoint"
+                   address="http://localhost:8090/report/"
+                   serviceClass="org.apache.camel.example.reportincident.ReportIncidentEndpoint"
+                   wsdlURL="wsdl/report_incident.wsdl"/>
+
+  <camelContext xmlns="http://camel.apache.org/schema/blueprint">
+  <route>
+    <from uri="cxf:bean:reportEndpoint"/>
+    <convertBodyTo type="org.apache.camel.example.reportincident.InputReportIncident"/>
+    <log message="Received report incident ${body.incidentId}"/>
+    <setHeader headerName="Exchange.FILE_NAME">
+      <simple>report-incident-${body.incidentId}.xml</simple>
+    </setHeader>
+    <to uri="file:work/incident"/>
+    <log message="Stored a copy of the incident as ${header.CamelFileNameProduced}"/>
+    <choice>
+      <when>
+        <simple>${body.phone.isEmpty}</simple>
+        <to uri="seda:emailMe"/>
+      </when>
+      <otherwise>
+        <to uri="seda:callMe"/>
+      </otherwise>
+    </choice>
+    <to uri="language:constant:classpath:ok.xml"/>
+    <convertBodyTo type="org.apache.camel.example.reportincident.OutputReportIncident"/>
+  </route>
+  <route>
+    <from uri="seda:callMe"/>
+    <log message="We are going to call ${body.phone}"/>
+  </route>
+  <route>
+    <from uri="seda:emailMe"/>
+    <log message="We are going to email ${body.email}"/>
+  </route>
+</camelContext>
+
+</blueprint>
