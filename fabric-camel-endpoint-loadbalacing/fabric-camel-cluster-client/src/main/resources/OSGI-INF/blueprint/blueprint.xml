@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="                 http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd">
+
+    <!-- 3. Instantiates the Fabric Camel component using the curator client
+		reference. -->
+    <bean class="io.fabric8.camel.FabricComponent" id="fabric-camel" />
+
+    <camelContext autoStartup="true" id="_context1" xmlns="http://camel.apache.org/schema/blueprint">
+        <!--
+	         1. Global error handler managing any kind of exceptions returned by a processor to the component issuing the creation of the exchange.
+	            The property redeliveryPolicyRef is defined with the next bean definition -->
+        <errorHandler id="errorHandler" redeliveryPolicyRef="redeliveryPolicy"/>
+        <!-- 2. This is the delivery policy that the error handler & Camel use to retry the call to the
+	            processor where the exception occurs. After -->
+        <redeliveryPolicyProfile id="redeliveryPolicy"
+            maximumRedeliveries="3" redeliveryDelay="5000" retryAttemptedLogLevel="WARN"/>
+        <route errorHandlerRef="errorHandler" id="fabric-client">
+            <!-- 3. The fabric Camel component is used to do a lookup into the Zk registry to find the hostname/port number used to call the HTTP server -->
+            <from id="_from1" uri="timer://foo?fixedRate=true&amp;period=1000"/>
+            <setBody id="_setBody1">
+                <simple>Hello from Fabric Client to group "Cluster"</simple>
+            </setBody>
+            <to id="_to1" uri="fabric-camel:cluster"/>
+            <log id="_log1" message=">>> ${body} : ${header.karaf.name}"/>
+        </route>
+    </camelContext>
+    <!-- 5. Does a lookup in the OSGI Service registry to retrieve the Apache
+		Camel component resolver service in order to load the JettyComponent from
+		the classloader of the bundle exposing it. -->
+    <reference filter="(component=jetty)"
+        id="reference-b4d9777b-ade8-4447-9251-f67e1110dc75" interface="org.apache.camel.spi.ComponentResolver"/>
+</blueprint>

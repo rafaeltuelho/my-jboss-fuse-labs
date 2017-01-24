@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="                 http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd">
+    <!-- osgi blueprint property placeholder -->
+    <!-- 1. The property placeholder allows you to look up the bind.address
+		and port into the OSGi Config Admin service. These properties are externalized
+		and not hardcoded within the route definition. -->
+    <cm:property-placeholder id="myConfig" persistent-id="io.fabric8.examples.camel.loadbalancing.server"/>
+    <!-- 2. Does a lookup in the OSGi service registry to retrieve the OSGi
+		Curator Service. That is, a ZooKeeper client calls the ZooKeeper server running
+		in the JBoss Fuse Fabric server. -->
+    <reference id="curator" interface="org.apache.curator.framework.CuratorFramework"/>
+    <!-- 3. Instantiates the Fabric Camel component using the curator client
+		reference. -->
+    <bean class="io.fabric8.camel.FabricComponent" id="fabric-camel">
+        <property name="curator" ref="curator"/>
+    </bean>
+    <!-- 4. Route that exposes a Jetty web container and returns the karaf container
+		name -karaf.name, in the message header. -->
+    <camelContext id="camel" trace="false" xmlns="http://camel.apache.org/schema/blueprint">
+        <!-- Uses Camel properties component and refers to the blueprint property
+			placeholder by its ID. -->
+        <propertyPlaceholder id="properties"
+            location="blueprint:myConfig" prefixToken="[[" suffixToken="]]"/>
+        <route id="fabric-server">
+            <!-- THIS IS WHERE THE JETTY WEB CONTAINER ENDPOINT IS REGISTERED WITH THE GROUPNAME CLUSTER -->
+            <from id="_from1" uri="fabric-camel:cluster:jetty:http://[[bind.address]]:[[port]]/fabric"/>
+            <log id="_log1" message="Request received : ${body}"/>
+            <setHeader headerName="karaf.name" id="_setHeader1">
+                <simple>${sys.karaf.name}</simple>
+            </setHeader>
+            <transform id="_transform1">
+                <simple>Response from Fabric Container</simple>
+            </transform>
+        </route>
+    </camelContext>
+    <!-- 5. Does a lookup in the OSGI Service registry to retrieve the Apache
+		Camel component resolver service in order to load the JettyComponent from
+		the classloader of the bundle exposing it. -->
+    <reference filter="(component=jetty)"
+        id="reference-b4d9777b-ade8-4447-9251-f67e1110dc74" interface="org.apache.camel.spi.ComponentResolver"/>
+</blueprint>
